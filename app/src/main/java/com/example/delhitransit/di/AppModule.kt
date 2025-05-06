@@ -1,12 +1,15 @@
+// AppModule.kt (updated)
 package com.example.delhitransit.di
 
 import android.content.Context
 import androidx.room.Room
 import com.example.delhitransit.data.local.MetroDatabase
 import com.example.delhitransit.data.local.StationDao
-import com.example.delhitransit.data.local.dao.MetroLineDao
+import com.example.delhitransit.data.local.dao.*
+import com.example.delhitransit.data.repository.BusRepository
 import com.example.delhitransit.data.repository.MetroRepository
-import com.example.delhitransit.viewmodel.JourneyViewModel
+import com.example.delhitransit.viewmodel.BusJourneyViewModel
+import com.example.delhitransit.viewmodel.MetroJourneyViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +22,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    // Database provider
     @Provides
     @Singleton
     fun provideMetroDatabase(@ApplicationContext context: Context): MetroDatabase {
@@ -27,10 +29,12 @@ object AppModule {
             context,
             MetroDatabase::class.java,
             "metro_database"
-        ).build()
+        )
+        .fallbackToDestructiveMigration()
+        .build()
     }
 
-    // DAO providers
+    // Metro DAO providers
     @Provides
     @Singleton
     fun provideStationDao(database: MetroDatabase): StationDao {
@@ -43,7 +47,51 @@ object AppModule {
         return database.metroLineDao()
     }
 
-    // Repository provider with new dependencies
+    // Bus DAO providers
+    @Provides
+    @Singleton
+    fun provideBusAgencyDao(database: MetroDatabase): BusAgencyDao {
+        return database.busAgencyDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBusRouteDao(database: MetroDatabase): BusRouteDao {
+        return database.busRouteDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBusStopDao(database: MetroDatabase): BusStopDao {
+        return database.busStopDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBusTripDao(database: MetroDatabase): BusTripDao {
+        return database.busTripDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideStopTimeDao(database: MetroDatabase): StopTimeDao {
+        return database.stopTimeDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCombinedBusDataDao(database: MetroDatabase): BusRouteTripDao {
+        return database.combinedBusDataDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBusStopSequenceDao(database: MetroDatabase): BusStopSequenceDao {
+        return database.busStopSequenceDao()
+    }
+
+
+    // Repository providers
     @Provides
     @Singleton
     fun provideMetroRepository(
@@ -53,6 +101,30 @@ object AppModule {
     ): MetroRepository {
         return MetroRepository(stationDao, metroLineDao, context)
     }
+
+    @Provides
+    @Singleton
+    fun provideBusRepository(
+        busAgencyDao: BusAgencyDao,
+        busRouteDao: BusRouteDao,
+        busStopDao: BusStopDao,
+        busTripDao: BusTripDao,
+        busStopSequenceDao: BusStopSequenceDao,
+        stopTimeDao: StopTimeDao,
+        busRouteTripDao: BusRouteTripDao,
+        @ApplicationContext context: Context
+    ): BusRepository {
+        return BusRepository(
+            busAgencyDao,
+            busRouteDao,
+            busStopDao,
+            busTripDao,
+            busStopSequenceDao,
+            stopTimeDao,
+            busRouteTripDao,
+            context
+        )
+    }
 }
 
 @Module
@@ -60,7 +132,13 @@ object AppModule {
 object JourneyModule {
     @Provides
     @ActivityRetainedScoped
-    fun provideJourneyViewModel(@ApplicationContext context: Context): JourneyViewModel {
-        return JourneyViewModel(context)
+    fun provideJourneyViewModel(@ApplicationContext context: Context): MetroJourneyViewModel {
+        return MetroJourneyViewModel(context)
+    }
+
+    @Provides
+    @ActivityRetainedScoped
+    fun provideBusJourneyViewModel(@ApplicationContext context: Context): BusJourneyViewModel {
+        return BusJourneyViewModel(context)
     }
 }

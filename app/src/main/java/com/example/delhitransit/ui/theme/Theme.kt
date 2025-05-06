@@ -19,24 +19,28 @@ import androidx.core.view.WindowCompat
 
 
 private val DarkColorScheme = darkColorScheme(
-    primary = DelhiBlue.copy(alpha = 0.8f),
+    primary = Color(0xFF4B8FFF),
     onPrimary = Color.White,
-    primaryContainer = DelhiBlue.copy(alpha = 0.6f),
+    primaryContainer = Color(0xFF0D47A1),
     onPrimaryContainer = Color.White,
-    secondary = DelhiOrange.copy(alpha = 0.8f),
+
+    secondary = Color(0xFFFFB74D),
     onSecondary = Color.Black,
-    secondaryContainer = DelhiOrange.copy(alpha = 0.6f),
-    onSecondaryContainer = Color.Black,
-    tertiary = DelhiRed.copy(alpha = 0.8f),
+    secondaryContainer = Color(0xFFE65100),
+    onSecondaryContainer = Color.White,
+
+    tertiary = Color(0xFFFF6659),
     onTertiary = Color.White,
+
     background = DarkBackground,
     onBackground = Color.White,
     surface = DarkSurfaceColor,
     onSurface = Color.White,
-    surfaceVariant = DarkCardBackground,
-    onSurfaceVariant = Color.White.copy(alpha = 0.7f),
-    error = ErrorRed,
-    onError = Color.White
+    surfaceVariant = Color(0xFF303030),
+    onSurfaceVariant = Color.White,
+
+    error = Color(0xFFFF8A80),
+    onError = Color.Black
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -63,7 +67,6 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun DelhiTransitTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false, // Set to false to ensure our custom colors are used
     content: @Composable () -> Unit
 ) {

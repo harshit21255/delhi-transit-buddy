@@ -26,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.delhitransit.screens.HomeScreen
+import com.example.delhitransit.screens.BusJourneyTrackingScreen
+import com.example.delhitransit.screens.BusScreen
+import com.example.delhitransit.screens.LandingPage
 import com.example.delhitransit.screens.MetroScreen
 import com.example.delhitransit.ui.theme.DelhiTransitTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +38,11 @@ import com.example.delhitransit.screens.JourneyTrackingScreen
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val dalvikVMHeap = Class.forName("dalvik.system.VMRuntime")
+            .getMethod("getRuntime")
+            .invoke(null)
+        dalvikVMHeap.javaClass.getMethod("setTargetHeapUtilization", Float::class.java)
+            .invoke(dalvikVMHeap, 0.75f)
         enableEdgeToEdge()
         setContent {
             DelhiTransitTheme {
@@ -49,6 +56,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 @Composable
 fun MainAppContent() {
@@ -74,32 +82,7 @@ fun MainAppContent() {
     )
 
     Scaffold(
-        bottomBar = {
-            NavigationBar {
-                navigationItems.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = selectedItemIndex == index,
-                        onClick = {
-                            selectedItemIndex = index
-                            navController.navigate(item.route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = item.selectedIcon,
-                                contentDescription = item.title
-    )
-                        },
-                        label = { Text(text = item.title) }
-                    )
-                }
-            }
-        }
+
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -107,13 +90,19 @@ fun MainAppContent() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") {
-                HomeScreen(navController = navController)
+                LandingPage(navController = navController)
             }
             composable("metro") {
                 MetroScreen(navController = navController)
             }
+            composable("bus") {
+                BusScreen(navController = navController)
+            }
             composable("journey_tracking") {
                 JourneyTrackingScreen(navController = navController)
+            }
+            composable("bus_journey_tracking") {
+                BusJourneyTrackingScreen(navController = navController)
             }
         }
     }

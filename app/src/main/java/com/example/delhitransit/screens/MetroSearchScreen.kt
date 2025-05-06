@@ -31,7 +31,7 @@ import com.example.delhitransit.data.model.Route
 import com.example.delhitransit.data.model.Station
 import com.example.delhitransit.ui.theme.DelhiBlue
 import com.example.delhitransit.ui.theme.DelhiRed
-import com.example.delhitransit.viewmodel.JourneyViewModel
+import com.example.delhitransit.viewmodel.MetroJourneyViewModel
 import com.example.delhitransit.viewmodel.MetroViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +39,7 @@ import com.example.delhitransit.viewmodel.MetroViewModel
 fun MetroScreen(
     navController: NavController,
     metroViewModel: MetroViewModel = hiltViewModel(),
-    journeyViewModel: JourneyViewModel = hiltViewModel()
+    journeyViewModel: MetroJourneyViewModel = hiltViewModel()
 ) {
     val searchResults by metroViewModel.searchResults.collectAsState()
     val route by metroViewModel.route.collectAsState()

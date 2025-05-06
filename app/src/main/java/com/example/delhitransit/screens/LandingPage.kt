@@ -23,7 +23,7 @@ import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun LandingPage(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -34,7 +34,7 @@ fun HomeScreen(navController: NavHostController) {
                     ) {
                         GradientTextSimple(
                             text = "Delhi Transit",
-                            fontSize = 52.sp,
+                            fontSize = 39.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -52,60 +52,9 @@ fun HomeScreen(navController: NavHostController) {
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-//            // Hero card with app logo
-//            Card(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(16.dp),
-//                shape = RoundedCornerShape(24.dp),
-//                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-//                colors = CardDefaults.cardColors(
-//                    containerColor = MaterialTheme.colorScheme.primaryContainer
-//                )
-//            ) {
-//                Column(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(24.dp),
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    Box(
-//                        modifier = Modifier
-//                            .size(100.dp)
-//                            .clip(CircleShape)
-//                            .background(MaterialTheme.colorScheme.background),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        Image(
-//                            painter = painterResource(id = R.drawable.delhi_metro_logo),
-//                            contentDescription = "Delhi Metro Logo",
-//                            modifier = Modifier
-//                                .size(80.dp)
-//                                .clip(CircleShape),
-//                            contentScale = ContentScale.Fit
-//                        )
-//                    }
-//
-//                    Spacer(modifier = Modifier.height(16.dp))
-//
-//                    Text(
-//                        text = "Open Delhi Transit",
-//                        style = MaterialTheme.typography.headlineMedium,
-//                        fontWeight = FontWeight.Bold,
-//                        color = MaterialTheme.colorScheme.onPrimaryContainer
-//                    )
-//
-//                    Spacer(modifier = Modifier.height(8.dp))
-//
-//                    Text(
-//                        text = "Navigate Delhi with ease",
-//                        style = MaterialTheme.typography.bodyLarge,
-//                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-//                    )
-//                }
-//            }
 
-            // Section title
+            Spacer(modifier = Modifier.height(12.dp))
+
             Text(
                 text = "SELECT MODE OF TRAVEL",
                 style = MaterialTheme.typography.labelLarge,
@@ -115,67 +64,20 @@ fun HomeScreen(navController: NavHostController) {
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
-            // Main action buttons
-            TransitActionCard(
+            ModeSelector(
                 icon = Icons.Default.Train,
                 title = "Metro Routes",
                 description = "Find the best metro route between stations",
                 onClick = { navController.navigate("metro") }
             )
 
-            TransitActionCard(
+            ModeSelector(
                 icon = Icons.Default.DirectionsBus,
                 title = "Bus Routes",
                 description = "Find the best bus route between stops",
-                onClick = { navController.navigate("real_time_transit") }
+                onClick = { navController.navigate("bus") }
             )
 
-//            TransitActionCard(
-//                icon = Icons.Default.Map,
-//                title = "Live Transit Map",
-//                description = "View transit vehicles on an interactive map",
-//                onClick = { navController.navigate("live_bus_map") }
-//            )
-
-//            // Quick actions section
-//            Text(
-//                text = "USEFUL TOOLS",
-//                style = MaterialTheme.typography.labelLarge,
-//                fontWeight = FontWeight.Bold,
-//                letterSpacing = 1.sp,
-//                color = MaterialTheme.colorScheme.primary,
-//                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-//            )
-//
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(horizontal = 16.dp, vertical = 8.dp),
-//                horizontalArrangement = Arrangement.spacedBy(8.dp)
-//            ) {
-//                SmallActionCard(
-//                    icon = Icons.Default.Train,
-//                    title = "Metro Info",
-//                    modifier = Modifier.weight(1f),
-//                    onClick = { navController.navigate("metro") }
-//                )
-//
-//                SmallActionCard(
-//                    icon = Icons.Default.DirectionsBus,
-//                    title = "Bus Tracking",
-//                    modifier = Modifier.weight(1f),
-//                    onClick = { navController.navigate("real_time_transit") }
-//                )
-//
-//                SmallActionCard(
-//                    icon = Icons.Default.Info,
-//                    title = "About",
-//                    modifier = Modifier.weight(1f),
-//                    onClick = { /* Show about dialog */ }
-//                )
-//            }
-
-            // App info card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -234,7 +136,7 @@ fun HomeScreen(navController: NavHostController) {
 }
 
 @Composable
-fun TransitActionCard(
+fun ModeSelector(
     icon: ImageVector,
     title: String,
     description: String,

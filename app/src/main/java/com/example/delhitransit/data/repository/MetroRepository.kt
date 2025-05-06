@@ -34,38 +34,31 @@ class MetroRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
-    // Create a repository-scoped coroutine scope with SupervisorJob()
     private val repositoryScope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
-    // In-memory graph for path finding
     private val graph = mutableMapOf<Station, MutableSet<Station>>()
     private var allStationsList = mutableListOf<Station>()
     private val stationMap = mutableMapOf<String, Station>() // For quick lookup by name
 
     init {
-        // Initialize data on repository creation with proper scope
         repositoryScope.launch {
             loadStationsFromDatabase()
             buildGraph()
         }
     }
 
-    // Flow to observe all stations from Room database
     val allStationsFlow: Flow<List<Station>>
         get() = stationDao.getAllStations()
             .map { entities ->
                 entities.map { it.toStation() }
             }
             .onEach { stations ->
-                // Update in-memory data structures when database changes
                 updateInMemoryData(stations)
             }
 
-    // Flow to observe all lines from Room database
     val allLinesFlow: Flow<List<MetroLine>> = metroLineDao.getAllLines()
         .map { entities -> entities.map { it.toMetroLine() } }
 
-    // Update in-memory cache of stations
     private fun updateInMemoryData(stations: List<Station>) {
         allStationsList = stations.toMutableList()
         stationMap.clear()
@@ -75,13 +68,11 @@ class MetroRepository @Inject constructor(
         buildGraph()
     }
 
-    // Load stations into memory from database
     private suspend fun loadStationsFromDatabase() {
         withContext(ioDispatcher) {
             val stations = stationDao.getAllStations().first().map { it.toStation() }
             allStationsList = stations.toMutableList()
 
-            // Create lookup map
             stationMap.clear()
             stations.forEach { station ->
                 stationMap[station.name.lowercase()] = station
@@ -89,30 +80,23 @@ class MetroRepository @Inject constructor(
         }
     }
 
-    // Build graph for path finding
     private fun buildGraph() {
         graph.clear()
 
-        // Group stations by line
         val lineStations = allStationsList.groupBy { it.line }
 
-        // Connect stations on the same line based on stationId sequence
         lineStations.forEach { (_, stations) ->
             if (stations.size > 1) {
-                // Sort by stationId to ensure correct sequence
                 val sortedStations = stations.sortedBy { it.stationId }
 
-                // Connect adjacent stations
                 for (i in 0 until sortedStations.size - 1) {
                     addEdge(sortedStations[i], sortedStations[i + 1])
                 }
             }
         }
 
-        // Connect interchange stations (stations with same name but different lines)
         val stationsByName = allStationsList.groupBy { it.name.lowercase() }
         stationsByName.values.filter { it.size > 1 }.forEach { sameNameStations ->
-            // Connect all stations with the same name (interchanges)
             for (i in 0 until sameNameStations.size) {
                 for (j in i + 1 until sameNameStations.size) {
                     addEdge(sameNameStations[i], sameNameStations[j])
@@ -128,13 +112,7 @@ class MetroRepository @Inject constructor(
         graph.getOrPut(station2) { mutableSetOf() }.add(station1)
     }
 
-    suspend fun getAllStations(): List<Station> = withContext(ioDispatcher) {
-        if (allStationsList.isEmpty()) {
-            // Load from database if memory cache is empty
-            loadStationsFromDatabase()
-        }
-        return@withContext allStationsList
-    }
+
 
     suspend fun getStation(stationName: String): Station? = withContext(ioDispatcher) {
         val normalizedName = stationName.lowercase().trim()
@@ -152,7 +130,6 @@ class MetroRepository @Inject constructor(
 
     suspend fun getRoute(sourceStation: String, destinationStation: String): Route {
         return withContext(ioDispatcher) {
-            // Make sure we have latest data
             if (allStationsList.isEmpty()) {
                 loadStationsFromDatabase()
                 buildGraph()
@@ -165,104 +142,76 @@ class MetroRepository @Inject constructor(
                 throw IllegalArgumentException("Invalid station names: $sourceStation or $destinationStation")
             }
 
-            val path = findShortestPath(source, destination)
+            val path = computeShortestRoute(source, destination)
 
             Route(
                 source = source,
                 destination = destination,
                 path = path,
-                totalStations = path.size - 1, // Number of stations excluding source
+                totalStations = path.size - 1,
                 interchangeCount = calculateInterchangeCount(path)
             )
         }
     }
 
-    private fun findShortestPath(source: Station, destination: Station): List<Station> {
-        // If source and destination are the same
-        if (source.name.equals(destination.name, ignoreCase = true)) {
-            return listOf(source)
+    private fun computeShortestRoute(start: Station, end: Station): List<Station> {
+        if (start.name.equals(end.name, ignoreCase = true)) return listOf(start)
+
+        val explored = mutableSetOf<Station>()
+        val shortestDistances = mutableMapOf<Station, Int>()
+        val pathTrace = mutableMapOf<Station, Station>()
+
+        val stationComparator = Comparator<Station> { a, b ->
+            (shortestDistances[a] ?: Int.MAX_VALUE).compareTo(shortestDistances[b] ?: Int.MAX_VALUE)
         }
 
-        // Initialize Dijkstra algorithm with priority queue
-        val visited = mutableSetOf<Station>()
-        val distances = mutableMapOf<Station, Int>()
-        val previousStation = mutableMapOf<Station, Station>()
+        val priorityQueue = PriorityQueue(stationComparator)
 
-        // Custom comparator for priority queue based on distance
-        val comparator = Comparator<Station> { s1, s2 ->
-            (distances[s1] ?: Int.MAX_VALUE).compareTo(distances[s2] ?: Int.MAX_VALUE)
-        }
-
-        val queue = PriorityQueue(comparator)
-
-        // Initialize all distances as infinite
         allStationsList.forEach { station ->
-            distances[station] = Int.MAX_VALUE
+            shortestDistances[station] = Int.MAX_VALUE
         }
 
-        // Distance to source is 0
-        distances[source] = 0
-        queue.add(source)
+        shortestDistances[start] = 0
+        priorityQueue.add(start)
 
-        // Main Dijkstra algorithm loop
-        while (queue.isNotEmpty()) {
-            val current = queue.poll() ?: continue // Safe null check
+        while (priorityQueue.isNotEmpty()) {
+            val currentStation = priorityQueue.poll() ?: continue
 
-            // If we reached the destination, we can stop
-            if (current == destination) {
-                break
-            }
+            if (currentStation == end) break
+            if (currentStation in explored) continue
 
-            // Skip if already visited
-            if (current in visited) {
-                continue
-            }
+            explored.add(currentStation)
 
-            visited.add(current)
+            val adjacentStations = graph[currentStation] ?: continue
+            for (nextStation in adjacentStations) {
+                if (nextStation !in explored) {
+                    val transitionCost = if (currentStation.line == nextStation.line) 1 else 4
+                    val totalDistance = (shortestDistances[currentStation] ?: Int.MAX_VALUE) + transitionCost
 
-            // Process all neighbors
-            val neighbors = graph[current] ?: continue // Safe null check
-            for (neighbor in neighbors) {
-                if (neighbor !in visited) {
-                    // Calculate new distance
-                    // 1 unit for same line stations, 3 units penalty for interchange
-                    val edgeWeight = if (current.line == neighbor.line) 1 else 3
-                    val currentDistance = distances[current] ?: Int.MAX_VALUE
-                    val newDistance = currentDistance + edgeWeight
-
-                    // If we found a better path
-                    val neighborDistance = distances[neighbor] ?: Int.MAX_VALUE
-                    if (newDistance < neighborDistance) {
-                        distances[neighbor] = newDistance
-                        previousStation[neighbor] = current
-                        queue.add(neighbor)
+                    if (totalDistance < (shortestDistances[nextStation] ?: Int.MAX_VALUE)) {
+                        shortestDistances[nextStation] = totalDistance
+                        pathTrace[nextStation] = currentStation
+                        priorityQueue.add(nextStation)
                     }
                 }
             }
         }
 
-        // Reconstruct path
-        val path = mutableListOf<Station>()
-
-        // Check if destination is reachable
-        if (previousStation.containsKey(destination)) {
-            var current: Station? = destination
-            while (current != null) {
-                path.add(0, current)
-                if (current == source) {
-                    break
-                }
-                current = previousStation[current]
+        // Backtrack to build final path
+        val resultPath = mutableListOf<Station>()
+        if (pathTrace.containsKey(end)) {
+            var step: Station? = end
+            while (step != null) {
+                resultPath.add(0, step)
+                if (step == start) break
+                step = pathTrace[step]
             }
         } else {
-            // No path found, return just source and destination
-            path.add(source)
-            if (source != destination) {
-                path.add(destination)
-            }
+            resultPath.add(start)
+            if (start != end) resultPath.add(end)
         }
 
-        return path
+        return resultPath
     }
 
     private fun calculateInterchangeCount(path: List<Station>): Int {
