@@ -1,6 +1,5 @@
 # Delhi Transit
 
-
 ## Overview
 
 Delhi Transit is a comprehensive public transportation companion app for Delhi, India, that helps users navigate the city's extensive metro and bus networks. It provides real-time journey planning, navigation assistance, and an intuitive interface for finding the best routes across Delhi's public transport system.
@@ -26,6 +25,11 @@ Delhi Transit is a comprehensive public transportation companion app for Delhi, 
 - **Dark Mode Support**: Full dark mode support for comfortable use in low-light conditions
 - **Customized Branding**: DMRC-specific theming with appropriate colors matching the city's transit system
 - **Offline Capability**: Core functionality works offline once data is downloaded
+
+### Accessibility Features
+- **Voice Accessibility**: Once the route is selected, the app reads out the route information such as the number of stops, where to change, and the line to change to, making it easier for visually impaired users.
+- **Auto Theme Switching**: The app automatically switches between light and dark mode based on ambient light, using a photo sensor to adjust the theme for a comfortable viewing experience.
+- **High Contrast Mode**: An accessibility feature that enables high contrast mode for users with visual impairments, ensuring better readability and clarity.
 
 ## Architecture
 
@@ -94,6 +98,12 @@ This application was developed to fulfill the following requirements:
    - Animated journey progress indicators
    - Material Design 3 implementation with Delhi Transit-specific theming
    - Custom icons and app logo used
+
+   
+
+## Project Structure
+
+
 
 ## Project Structure
 
