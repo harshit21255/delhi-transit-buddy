@@ -21,7 +21,7 @@ val ErrorRed = Color(0xFFE53935)
 val CardBackground = Color(0xFFFFFFFF)
 val SurfaceColor = Color(0xFFFFFFFF)
 
-//val DarkCardBackground = Color(0xFF1E1E1E)
+val DarkCardBackground = Color(0xFF1E1E1E)
 val DarkSurfaceColor = Color(0xFF242424)
 //val DarkThemePrimaryBlue = Color(0xFF4B8FFF)
 //val DarkThemeSecondaryOrange = Color(0xFFFFB74D)

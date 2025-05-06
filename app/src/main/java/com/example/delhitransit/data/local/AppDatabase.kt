@@ -19,7 +19,7 @@ import com.example.delhitransit.data.local.entity.*
         StopTimeEntity::class,
         CombinedBusDataEntity::class
     ],
-    version = 1
+    version = 3
 )
 abstract class MetroDatabase : RoomDatabase() {
     abstract fun stationDao(): StationDao

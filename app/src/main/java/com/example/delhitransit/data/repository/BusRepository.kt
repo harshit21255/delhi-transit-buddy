@@ -45,40 +45,37 @@ class BusRepository @Inject constructor(
                 Log.d("BusRepository", "Database has $routeCount routes and $stopCount stops")
 
                 // Only initialize if needed
-                if (routeCount == 0 || stopCount == 0) {
-                    Log.d("BusRepository", "Initializing database from GTFS files")
+                Log.d("BusRepository", "Initializing database from GTFS files")
 
-                    // Load entities in appropriate order
-                    loadAgenciesFromCsv().also {
-                        busAgencyDao.insertAgencies(it)
-                        Log.d("BusRepository", "Loaded ${it.size} agencies")
-                    }
-
-                    loadRoutesFromCsv().also {
-                        busRouteDao.insertRoutes(it)
-                        Log.d("BusRepository", "Loaded ${it.size} routes")
-                    }
-
-                    loadStopsFromCsv().also {
-                        busStopDao.insertStops(it)
-                        Log.d("BusRepository", "Loaded ${it.size} stops")
-                    }
-
-                    loadTripsFromCsv().also {
-                        busTripDao.insertTrips(it)
-                        Log.d("BusRepository", "Loaded ${it.size} trips")
-                    }
-
-                    // Load stop times with optimized method
-                    loadStopTimesFromCsv()
-
-                    // Generate combined data after all entities are loaded
-                    generateCombinedData()
-
-                    Log.d("BusRepository", "Database initialization completed")
-                } else {
-                    Log.d("BusRepository", "Database already populated, skipping initialization")
+                // Load entities in appropriate order
+                loadAgenciesFromCsv().also {
+                    busAgencyDao.insertAgencies(it)
+                    Log.d("BusRepository", "Loaded ${it.size} agencies")
                 }
+
+                loadRoutesFromCsv().also {
+                    busRouteDao.insertRoutes(it)
+                    Log.d("BusRepository", "Loaded ${it.size} routes")
+                }
+
+                loadStopsFromCsv().also {
+                    busStopDao.insertStops(it)
+                    Log.d("BusRepository", "Loaded ${it.size} stops")
+                }
+
+                loadTripsFromCsv().also {
+                    busTripDao.insertTrips(it)
+                    Log.d("BusRepository", "Loaded ${it.size} trips")
+                }
+
+                // Load stop times with optimized method
+                loadStopTimesFromCsv()
+
+                // Generate combined data after all entities are loaded
+                generateCombinedData()
+
+                Log.d("BusRepository", "Database initialization completed")
+
             } catch (e: Exception) {
                 Log.e("BusRepository", "Error initializing database: ${e.message}", e)
             }

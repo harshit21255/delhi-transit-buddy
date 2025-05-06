@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "7f9de74b1ff51a8315181ac50506d3d9",
+    "version": 6,
+    "identityHash": "61594cbc4eaab35417890dab5a5bc52e",
     "entities": [
       {
         "tableName": "stations",
@@ -339,68 +339,12 @@
           }
         ],
         "foreignKeys": []
-      },
-      {
-        "tableName": "combined_bus_data",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `busId` TEXT NOT NULL, `routeId` TEXT NOT NULL, `routeName` TEXT NOT NULL, `stopId` TEXT NOT NULL, `stopName` TEXT NOT NULL, `stopSequence` INTEGER NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "busId",
-            "columnName": "busId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "routeId",
-            "columnName": "routeId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "routeName",
-            "columnName": "routeName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "stopId",
-            "columnName": "stopId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "stopName",
-            "columnName": "stopName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "stopSequence",
-            "columnName": "stopSequence",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7f9de74b1ff51a8315181ac50506d3d9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '61594cbc4eaab35417890dab5a5bc52e')"
     ]
   }
 }

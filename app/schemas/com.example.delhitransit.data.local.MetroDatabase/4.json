@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "7f9de74b1ff51a8315181ac50506d3d9",
+    "version": 4,
+    "identityHash": "b01b3b962ae1fc7c8275bde7ae54a14e",
     "entities": [
       {
         "tableName": "stations",
@@ -275,132 +275,12 @@
         },
         "indices": [],
         "foreignKeys": []
-      },
-      {
-        "tableName": "bus_stop_times",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tripId` TEXT NOT NULL, `stopId` TEXT NOT NULL, `arrivalTime` TEXT NOT NULL, `departureTime` TEXT NOT NULL, `stopSequence` INTEGER NOT NULL, PRIMARY KEY(`tripId`, `stopSequence`))",
-        "fields": [
-          {
-            "fieldPath": "tripId",
-            "columnName": "tripId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "stopId",
-            "columnName": "stopId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "arrivalTime",
-            "columnName": "arrivalTime",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "departureTime",
-            "columnName": "departureTime",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "stopSequence",
-            "columnName": "stopSequence",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "tripId",
-            "stopSequence"
-          ]
-        },
-        "indices": [
-          {
-            "name": "index_bus_stop_times_stopId",
-            "unique": false,
-            "columnNames": [
-              "stopId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_bus_stop_times_stopId` ON `${TABLE_NAME}` (`stopId`)"
-          },
-          {
-            "name": "index_bus_stop_times_tripId",
-            "unique": false,
-            "columnNames": [
-              "tripId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_bus_stop_times_tripId` ON `${TABLE_NAME}` (`tripId`)"
-          }
-        ],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "combined_bus_data",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `busId` TEXT NOT NULL, `routeId` TEXT NOT NULL, `routeName` TEXT NOT NULL, `stopId` TEXT NOT NULL, `stopName` TEXT NOT NULL, `stopSequence` INTEGER NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "busId",
-            "columnName": "busId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "routeId",
-            "columnName": "routeId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "routeName",
-            "columnName": "routeName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "stopId",
-            "columnName": "stopId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "stopName",
-            "columnName": "stopName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "stopSequence",
-            "columnName": "stopSequence",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7f9de74b1ff51a8315181ac50506d3d9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b01b3b962ae1fc7c8275bde7ae54a14e')"
     ]
   }
 }

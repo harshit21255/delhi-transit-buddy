@@ -8,6 +8,7 @@ import com.example.delhitransit.data.local.StationDao
 import com.example.delhitransit.data.local.dao.*
 import com.example.delhitransit.data.repository.BusRepository
 import com.example.delhitransit.data.repository.MetroRepository
+import com.example.delhitransit.services.AccessibilityService
 import com.example.delhitransit.viewmodel.BusJourneyViewModel
 import com.example.delhitransit.viewmodel.MetroJourneyViewModel
 import dagger.Module
@@ -124,6 +125,13 @@ object AppModule {
             busRouteTripDao,
             context
         )
+    }
+
+    // Accessibility service provider
+    @Provides
+    @Singleton
+    fun provideAccessibilityService(@ApplicationContext context: Context): AccessibilityService {
+        return AccessibilityService(context)
     }
 }
 

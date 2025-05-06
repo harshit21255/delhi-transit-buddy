@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -29,6 +30,7 @@ import androidx.navigation.NavController
 import com.example.delhitransit.R
 import com.example.delhitransit.data.model.Route
 import com.example.delhitransit.data.model.Station
+import com.example.delhitransit.services.AccessibilityService
 import com.example.delhitransit.ui.theme.DelhiBlue
 import com.example.delhitransit.ui.theme.DelhiRed
 import com.example.delhitransit.viewmodel.MetroJourneyViewModel
@@ -41,6 +43,10 @@ fun MetroScreen(
     metroViewModel: MetroViewModel = hiltViewModel(),
     journeyViewModel: MetroJourneyViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val accessibilityService = remember { AccessibilityService(context) }
+    val isSpeaking by accessibilityService.isSpeaking.collectAsState()
+
     val searchResults by metroViewModel.searchResults.collectAsState()
     val route by metroViewModel.route.collectAsState()
     val error by metroViewModel.error.collectAsState()
@@ -51,10 +57,18 @@ fun MetroScreen(
     var destinationStation by remember { mutableStateOf("") }
     var selectionMode by remember { mutableStateOf<String?>(null) }
 
+    // Clean up resources when the component is disposed
+    DisposableEffect(Unit) {
+        onDispose {
+            accessibilityService.cleanup()
+        }
+    }
+
     // When a route is found, immediately set it in the JourneyViewModel
     LaunchedEffect(route) {
         route?.let {
             journeyViewModel.setJourney(it)
+            accessibilityService.speakMetroRoute(it)
         }
     }
 
@@ -227,6 +241,14 @@ fun MetroScreen(
                     route = route!!,
                     onBeginJourney = {
                         navController.navigate("journey_tracking")
+                    },
+                    onSpeakRoute = {
+                        // Use accessibility service to read out the route
+                        if (isSpeaking) {
+                            accessibilityService.stopSpeaking()
+                        } else {
+                            accessibilityService.speakMetroRoute(route!!)
+                        }
                     }
                 )
             } else {
@@ -493,7 +515,8 @@ fun EnhancedStationItem(
 @Composable
 fun EnhancedRouteDetails(
     route: Route,
-    onBeginJourney: () -> Unit
+    onBeginJourney: () -> Unit,
+    onSpeakRoute: () -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier
@@ -588,27 +611,49 @@ fun EnhancedRouteDetails(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    Button(
-                        onClick = onBeginJourney,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = DelhiRed
-                        )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Directions,
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Begin Journey",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Button(
+                            onClick = onBeginJourney,
+                            modifier = Modifier
+                                .weight(3f)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = DelhiRed
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Directions,
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Begin Journey",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Button(
+                            onClick = { onSpeakRoute() },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.VolumeUp,
+                                contentDescription = "Speak Route",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
                 }
             }

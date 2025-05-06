@@ -1,4 +1,3 @@
-// BusSearchScreen.kt (new file)
 package com.example.delhitransit.screens
 
 import androidx.compose.foundation.BorderStroke
@@ -33,6 +32,8 @@ import com.example.delhitransit.data.model.BusStop
 import com.example.delhitransit.ui.theme.DelhiOrange
 import com.example.delhitransit.viewmodel.BusJourneyViewModel
 import com.example.delhitransit.viewmodel.BusViewModel
+import androidx.compose.ui.platform.LocalContext
+import com.example.delhitransit.services.AccessibilityService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +42,10 @@ fun BusScreen(
     busViewModel: BusViewModel = hiltViewModel(),
     busJourneyViewModel: BusJourneyViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val accessibilityService = remember { AccessibilityService(context) }
+    val isSpeaking by accessibilityService.isSpeaking.collectAsState()
+
     val searchResults by busViewModel.searchResults.collectAsState()
     val routes by busViewModel.routes.collectAsState()
     val selectedJourney by busViewModel.selectedJourney.collectAsState()
@@ -56,6 +61,7 @@ fun BusScreen(
     LaunchedEffect(selectedJourney) {
         selectedJourney?.let {
             busJourneyViewModel.setJourney(it)
+            accessibilityService.speakBusRoute(selectedJourney!!)
         }
     }
 
@@ -248,6 +254,14 @@ fun BusScreen(
                     },
                     onBack = {
                         busViewModel.clearSelectedJourney()
+                    },
+                    onSpeakRoute = {
+                        // Use accessibility service to read out the route
+                        if (isSpeaking) {
+                            accessibilityService.stopSpeaking()
+                        } else {
+                            accessibilityService.speakBusRoute(selectedJourney!!)
+                        }
                     }
                 )
             } else {
@@ -749,7 +763,8 @@ fun BusRouteStat(
 fun BusJourneyDetails(
     journey: BusJourney,
     onBeginJourney: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onSpeakRoute: () -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier
@@ -914,7 +929,8 @@ fun BusJourneyDetails(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Row(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
                             onClick = onBack,
@@ -934,8 +950,6 @@ fun BusJourneyDetails(
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(16.dp))
-
                         Button(
                             onClick = onBeginJourney,
                             modifier = Modifier.weight(2f),
@@ -953,6 +967,21 @@ fun BusJourneyDetails(
                                 text = "Begin Journey",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Button(
+                            onClick = { onSpeakRoute() },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.VolumeUp,
+                                contentDescription = "Speak Route",
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     }

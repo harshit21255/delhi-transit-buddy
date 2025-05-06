@@ -306,6 +306,10 @@ We welcome contributions to the Delhi Transit project! If you'd like to contribu
 4. Push to the branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
 ## Acknowledgments
 
 - Delhi Metro Rail Corporation for station data
