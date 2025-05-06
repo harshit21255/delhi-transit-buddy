@@ -130,9 +130,10 @@ app/
    ```bash
    git clone https://github.com/harshit21255/delhi-transit-buddy.git
    ```
-2. Open the project in Android Studio
-3. Sync the project with Gradle files
-4. Run the app on an emulator or physical device
+2. Add ```GTFS/stop_times.txt``` from OTD static data in ```app/src/main/assets/GTFS/```
+3. Open the project in Android Studio
+4. Sync the project with Gradle files
+5. Run the app on an emulator or physical device
 
 ## Usage Guide
 
@@ -312,13 +313,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - Delhi Metro Rail Corporation for station data
-- OpenStreetMap contributors for map data
 - GTFS data providers for Delhi bus information
 - All open-source libraries used in this project
 
 ## Contact
 
-For any questions or suggestions, please contact us at:
-- Email: your.email@example.com
-- Twitter: [@DelhiTransitApp](https://twitter.com/DelhiTransitApp)
-- Website: [www.delhitransitapp.com](https://www.delhitransitapp.com)
+For any questions or suggestions, please contact me at:
+- Email: harshit21255@iiitd.ac.in
